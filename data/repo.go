@@ -1,7 +1,6 @@
 package data
 
 import (
-	"errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
@@ -12,9 +11,7 @@ func CreateUser(user *User) error {
 
 	session, err := mgo.Dial(endpoint)
 	if err != nil {
-		msg := "failed to connect to mongo:" + endpoint
 		log.Fatal(err)
-		return errors.New(msg)
 	}
 	defer session.Close()
 
@@ -32,17 +29,14 @@ func CreateUser(user *User) error {
 		Sparse:     true,
 	}
 
-	err = u.EnsureIndex(index)
-	if err != nil {
-		panic(err)
+	if err := u.EnsureIndex(index); err != nil {
+		log.Fatal(err)
 	}
 
 	user.Id = bson.NewObjectId()
 	err = u.Insert(user)
 	if err != nil {
-		msg := err.Error()
-		log.Fatal(msg)
-		return errors.New(msg)
+		log.Fatal(err)
 	}
 
 	return nil
@@ -53,19 +47,15 @@ func GetUser(id string) (User, error) {
 
 	session, err := mgo.Dial(endpoint)
 	if err != nil {
-		msg := "failed to connect to mongo:" + endpoint
 		log.Fatal(err)
-		return User{}, errors.New(msg)
 	}
 	defer session.Close()
 
 	c := session.DB(db).C("users")
-	user := User{}
-	err = c.Find(bson.M{"_id":bson.ObjectIdHex(id)}).One(&user)
+	var user User
+	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&user)
 	if err != nil {
-		msg := err.Error()
-		log.Fatal(msg)
-		return User{}, errors.New(msg)
+		log.Fatal(err)
 	}
 	return user, nil
 }

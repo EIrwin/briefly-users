@@ -2,24 +2,25 @@ package services
 
 import (
 	"github.com/eirwin/briefly-users/data"
+	"log"
 )
 
 func CreateUser(req *CreateUserRequest) (data.User, error) {
-	user := data.User{HourlyRate:req.HourlyRate,Salary:req.Salary}
+	user := data.User{HourlyRate: req.HourlyRate, Salary: req.Salary}
 	err := data.CreateUser(&user)
 	if err != nil {
-		return user,err
+		log.Fatal(err)
 	}
-	return  user,nil
+	return user, nil
 }
 
 func GetUser(req *GetUserRequest) (data.User, error) {
 	var user data.User
 	user, err := data.GetUser(req.Id)
 	if err != nil {
-		return user,err
+		log.Fatal(err)
 	}
-	return user,nil
+	return user, nil
 }
 
 type CreateUserRequest struct {
