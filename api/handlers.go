@@ -2,11 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"net/http"
-    	"io"
-    	"io/ioutil"
 	"github.com/gorilla/mux"
+	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 
 	"github.com/eirwin/briefly-users/services"
 )
@@ -19,19 +19,18 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Get(w http.ResponseWriter, r *http.Request) {	
+func Get(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	log.Print(id)
-	req := services.GetUserRequest{Id:id}
-	user,err := services.GetUser(&req)
+	req := services.GetUserRequest{Id: id}
+	user, err := services.GetUser(&req)
 	if err != nil {
 		log.Fatal(err)
 		w.WriteHeader(http.StatusNotFound)
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(user); err != nil {
@@ -45,11 +44,11 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	if err := r.Body.Close(); err != nil {
 		panic(err)
 	}
-	
+
 	if err := json.Unmarshal(body, &req); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
@@ -58,13 +57,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	user,err := services.CreateUser(&req)
+	user, err := services.CreateUser(&req)
 	if err != nil {
 		msg := err.Error()
 		log.Fatal(msg)
 		w.WriteHeader(http.StatusBadRequest)
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(user); err != nil {
